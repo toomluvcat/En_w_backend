@@ -1,7 +1,7 @@
 package main
 
 import (
-	"render/app/conect"
+	"Render/app/conect"
 
 	"github.com/gin-gonic/gin"
 )
