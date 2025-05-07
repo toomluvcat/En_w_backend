@@ -1,0 +1,77 @@
+package handler
+
+import (
+	"Render/app/conect"
+	"Render/app/model"
+	"fmt"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgconn"
+)
+
+func CreateUser(c *gin.Context) {
+	var req model.User
+	if err := c.BindJSON(&req); err != nil {
+		c.Status(400)
+		return
+	}
+	result := conect.DB.Create(&req)
+
+	if result.Error != nil {
+		if pgErr,ok:= result.Error.(*pgconn.PgError); ok &&pgErr.Code=="23505"{
+			c.JSON(400,gin.H{"error":"Student ID OR Email have match another Student ID OR Email"})
+			return
+		}
+		c.JSON(500,gin.H{"error":fmt.Sprintf("Fail to insert User: %v",result.Error)})
+		return
+	}
+	c.JSON(201, gin.H{"message": "Create user successfully", "req": req})
+}
+
+func GetUserByID(c *gin.Context) {
+	id := c.Param("id")
+
+	if id == "" {
+		c.JSON(400, gin.H{"error": "Not found id"})
+		return
+	}
+
+	var user model.User
+	if err := conect.DB.First(&user, id).Error; err != nil {
+		c.JSON(500, gin.H{"error": "Fail to select value"})
+		return
+	}
+
+	c.JSON(200, user)
+}
+
+func PutUserByID(c *gin.Context) {
+	id := c.Param("id")
+
+	if id == "" {
+		c.JSON(400, gin.H{"error": "Not found id"})
+		return
+	}
+
+	type ReqPut struct {
+		Name      string
+		StudentID string
+		Major     string
+	}
+
+	var req ReqPut
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": "Invalid JSON payload"})
+		return
+	}
+
+	if err := conect.DB.Model(&model.User{}).Where("users.id=?", id).Updates(map[string]interface{}{
+		"name":      req.Name,
+		"student_id": req.StudentID,
+		"major":     req.Major,
+	}).Error; err != nil {
+		c.JSON(500,gin.H{"error":fmt.Sprintf("Fail to update value :%v",err)})
+		return
+	}
+	c.Status(201)
+}
