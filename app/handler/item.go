@@ -3,6 +3,7 @@ package handler
 import (
 	"Render/app/conect"
 	"Render/app/model"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -55,7 +56,19 @@ func DelItemByID(c *gin.Context){
 }
 
 
-func PutItemByID (c *gin.Context){
+func PutItemByID(c *gin.Context) {
 	id := c.Param("id")
-	if err:= conect.DB.Update()
+
+	var req model.Item
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": "Invalid JSON payload"})
+		return
+	}
+
+	if err := conect.DB.Model(&model.Item{}).Where("id = ?", id).Updates(req).Error; err != nil {
+		c.JSON(500, gin.H{"error": fmt.Sprintf("Fail to update item: %v", err)})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Item updated successfully"})
 }

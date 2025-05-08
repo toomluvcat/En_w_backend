@@ -21,5 +21,8 @@ func main() {
 	r.POST("/item",handler.CreateItem)
 	r.GET("/item",handler.GetAllItem)
 	r.DELETE("/item/:id",handler.DelItemByID)
+
+	r.POST("/event",handler.CreateEvent)
+	r.PUT("/event/:id",handler.PutEventdByID)
 	r.Run(":8080")
 }

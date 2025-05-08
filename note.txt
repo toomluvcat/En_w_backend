@@ -1,0 +1,35 @@
+package model
+
+import "time"
+
+type User struct {
+	StudentID string `gorm:"primaryKey;size:11"`
+	Name      string
+	Email     string `gorm:"unique"`
+	Major     string
+}
+
+type Item struct {
+	ID              uint   `gorm:"primaryKey"`
+	Name            string `gorm:"unique"`
+	MaxQuantity     int
+	CurrentQuantity int
+	EventItems      []EventItem `gorm:"foreignKey:ItemID"`
+}
+type Event struct {
+	ID         uint `gorm:"primaryKey"`
+	EventTime  time.Time
+	StudentID  string    
+	User       User        `gorm:"foreignKey:StudentID;references:StudentID"`
+	EventItems []EventItem `gorm:"foreignKey:EventID"` 
+}
+
+type EventItem struct {
+	ID       uint  `gorm:"primaryKey"`
+	EventID  uint
+	ItemID   uint
+	Quantity int
+	Event    Event `gorm:"foreignKey:EventID"` 
+	Item     Item  `gorm:"foreignKey:ItemID"`
+}
+

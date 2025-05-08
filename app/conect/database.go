@@ -31,7 +31,7 @@ func ConnectDB() {
 		log.Fatalf("Fail to connect: %v", err)
 	}
 
-	fmt.Println("Connected to the database!")
+	// fmt.Println("Connected to the database!")
 	// _=DB.Migrator().DropTable(&model.Loan{}, &model.Event{}, &model.User{}, &model.Item{})
 	// err = DB.AutoMigrate(&model.User{},&model.Item{},model.Loan{},&model.Event{})
 	// if err != nil {
