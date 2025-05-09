@@ -31,11 +31,17 @@ func ConnectDB() {
 		log.Fatalf("Fail to connect: %v", err)
 	}
 
-	// fmt.Println("Connected to the database!")
-	// _=DB.Migrator().DropTable(&model.Loan{}, &model.Event{}, &model.User{}, &model.Item{})
-	// err = DB.AutoMigrate(&model.User{},&model.Item{},model.Loan{},&model.Event{})
+	fmt.Println("Connected to the database!")
+
+	// // Drop bookmarks ก่อนเพราะเป็น many2many join table
+	// _ = DB.Migrator().DropTable("bookmarks")
+	// _ = DB.Migrator().DropTable(&model.Loan{}, &model.Event{}, &model.User{}, &model.Item{})
+
+	// // สร้างตาราง เรียงตามความสัมพันธ์ FK
+	// err = DB.AutoMigrate(&model.Item{}, &model.User{}, &model.Event{}, &model.Loan{})
 	// if err != nil {
 	// 	log.Fatalf("Fail to migrate: %v", err)
 	// }
+
 	fmt.Println("Database migrated successfully!")
 }

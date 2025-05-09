@@ -11,7 +11,7 @@ import (
 
 func GetAllEvent(c *gin.Context) {
 
-	type loanItem struct {
+	type LoanItem struct {
 		ItemID   uint
 		Name string
 		Quantity int
@@ -22,11 +22,96 @@ func GetAllEvent(c *gin.Context) {
 		UserName  string
 		UserID    uint
 		CreatedAt time.Time
+		ApprovedAt time.Time
 		Status    string
-		loan      []loanItem
+		Loan      []LoanItem
 	}
 
-	var re
+	var event []model.Event
+	if err:=conect.DB.Preload("User").Preload("Loans.Item").Find(&event).Error;err!=nil{
+		c.JSON(500,gin.H{"message":"Fail to fetch event"})
+		return
+	}
+	var res []Response
+	for _,e := range event{
+		var loanItems []LoanItem
+		for _,l:= range e.Loans{
+			loanItems =append(loanItems, LoanItem{
+				ItemID: l.ItemID,
+				Name: l.Item.Name,
+				Quantity: l.Quantity,
+			})
+		}
+		var ApprovedAt time.Time
+		if e.Status != "Pending"{
+			ApprovedAt=e.CreatedAt
+		}
+		res = append(res, Response{
+			EventID: e.ID,
+			UserName: e.User.Name,
+			UserID: e.UserID,
+			CreatedAt: e.CreatedAt,
+			ApprovedAt: ApprovedAt,
+			Status: e.Status,
+			Loan: loanItems,
+			
+		})
+	}
+
+	c.JSON(200,res)
+}
+
+func GetEventByUserID(c *gin.Context){
+	id := c.Param("id")
+
+	type LoanItem struct {
+		ItemID   uint
+		Name string
+		Quantity int
+	}
+
+	type Response struct {
+		EventID   uint
+		UserName  string
+		UserID    uint
+		CreatedAt time.Time
+		ApprovedAt time.Time
+		Status    string
+		Loan      []LoanItem
+	}
+
+	var event []model.Event
+	if err:=conect.DB.Preload("User").Preload("Loans.Item").Where("user_id = ?",).Find(&event).Error;err!=nil{
+		c.JSON(500,gin.H{"message":"Fail to fetch event"})
+		return
+	}
+	var res []Response
+	for _,e := range event{
+		var loanItems []LoanItem
+		for _,l:= range e.Loans{
+			loanItems =append(loanItems, LoanItem{
+				ItemID: l.ItemID,
+				Name: l.Item.Name,
+				Quantity: l.Quantity,
+			})
+		}
+		var ApprovedAt time.Time
+		if e.Status != "Pending"{
+			ApprovedAt=e.CreatedAt
+		}
+		res = append(res, Response{
+			EventID: e.ID,
+			UserName: e.User.Name,
+			UserID: e.UserID,
+			CreatedAt: e.CreatedAt,
+			ApprovedAt: ApprovedAt,
+			Status: e.Status,
+			Loan: loanItems,
+			
+		})
+	}
+
+	c.JSON(200,res)
 }
 
 func CreateEvent(c *gin.Context) {

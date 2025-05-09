@@ -8,9 +8,11 @@ type User struct {
 	gorm.Model
 	Name      string
 	StudentID string
-	Events    []Event `gorm:"foreignKey:UserID;references:ID"`
 	Major     string
 	Email     string `gorm:"unique"`
+	BookmarksItems	[]Item `gorm:"many2many:bookmarks"`
+	Events    []Event `gorm:"foreignKey:UserID;references:ID"`
+
 }
 
 type Event struct {
@@ -24,8 +26,11 @@ type Event struct {
 type Item struct {
 	gorm.Model
 	Name            string `gorm:"unique"`
+	Description		string
+	Category	string
 	MaxQuantity     int    `gorm:"check:max_quantity>=0"`
 	CurrentQuantity int    `gorm:"check:current_quantity>=0"`
+	BookmarkedBy	[]User `gorm:"many2many:bookmarks;"`
 }
 
 type Loan struct {
