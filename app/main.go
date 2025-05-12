@@ -45,4 +45,5 @@ func main() {
 	if port == "" {
 		port = "8080" // fallback เผื่อใช้ local
 	}
+	r.Run(":"+port)
 }
