@@ -1,6 +1,7 @@
 package conect
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -10,9 +11,7 @@ import (
 var CLD *cloudinary.Cloudinary
 
 func ConnectCloudinary() {
-
 	
-
 	KeyName := os.Getenv("KeyName")
 	ApiKey := os.Getenv("ApiKey")
 	ApiSecret := os.Getenv("ApiSecret")
@@ -22,5 +21,6 @@ func ConnectCloudinary() {
 	if err != nil {
 		log.Fatal("Fail to connect cloudinary")
 	}
-	CLD=cld
+	CLD= cld
+	fmt.Println("sucessfully to connect")
 }

@@ -14,15 +14,17 @@ import (
 
 func CreateItem(c *gin.Context) {
 	file, fileHeader, err := c.Request.FormFile("file")
-
 	if err != nil {
+		fmt.Println(err)
 		c.JSON(400, gin.H{"error": "Fail to load file"})
+		return
 	}
 	defer file.Close()
 
 	url, err := UploadToCld(c, file, fileHeader.Filename)
 	if err != nil {
-		c.JSON(500, err)
+		c.JSON(500, gin.H{"error": "Failed to upload to Cloudinary"})
+		return
 	}
 
 	itemDataJson := c.PostForm("itemData")
@@ -52,12 +54,12 @@ func CreateItem(c *gin.Context) {
 
 	result := conect.DB.Create(&item)
 	if result.Error != nil {
-		c.Status(500)
+		c.JSON(500, gin.H{"error": "Database insert failed"})
 		return
 	}
-	c.JSON(200, url)
-
+	c.JSON(200, gin.H{"url": url})
 }
+
 
 func ToggleBookMark(c *gin.Context) {
 	type Req struct {
