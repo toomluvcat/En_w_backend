@@ -26,6 +26,7 @@ func main() {
         AllowCredentials: true,
         MaxAge:           12 * time.Hour,
     }))
+	r.POST("/",Ping)
 	r.POST("/user",handler.CreateUser)
 	r.GET("/user/:id",handler.GetUserByID)
 	r.PUT("/user/:id",handler.PutUserByID)
