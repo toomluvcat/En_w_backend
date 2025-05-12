@@ -13,31 +13,27 @@ import (
 var DB *gorm.DB
 
 func ConnectDB() {
-	
+    HOST := os.Getenv("HOST")
+    DATABASE := os.Getenv("DATABASE")
+    USERNAME := os.Getenv("USER")
+    PASSWORD := os.Getenv("PASSWORD")
+    PORT := os.Getenv("PORT")
 
-	HOST := os.Getenv("HOST")
-	DATABASE := os.Getenv("DATABASE")
-	USERNAME := os.Getenv("USER")
-	PASSWORD := os.Getenv("PASSWORD")
-	PORT := os.Getenv("PORT")
+    dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=require", HOST, PORT, USERNAME, PASSWORD, DATABASE)
 
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=require", HOST, PORT, USERNAME, PASSWORD, DATABASE)
+    var err error
+    // ใช้ = แทน := เพื่อกำหนดค่าให้กับตัวแปร global
+    DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+    if err != nil {
+        log.Fatalf("Fail to connect: %v", err)
+    }
 
-	DB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Fatalf("Fail to connect: %v", err)
-	}
+    fmt.Println("Connected to the database!")
 
-	fmt.Println("Connected to the database!")
+    err = DB.AutoMigrate(&model.Item{}, &model.User{}, &model.Event{}, &model.Loan{})
+    if err != nil {
+        log.Fatalf("Fail to migrate: %v", err)
+    }
 
-	// // Drop bookmarks ก่อนเพราะเป็น many2many join table
-	// _ = DB.Migrator().DropTable("bookmarks")
-	// _ = DB.Migrator().DropTable(&model.Loan{}, &model.Event{}, &model.User{}, &model.Item{})
-
-	err = DB.AutoMigrate(&model.Item{}, &model.User{}, &model.Event{}, &model.Loan{})
-	if err != nil {
-		log.Fatalf("Fail to migrate: %v", err)
-	}
-
-	fmt.Println("Database migrated successfully!")
+    fmt.Println("Database migrated successfully!")
 }
