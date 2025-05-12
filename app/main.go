@@ -3,6 +3,7 @@ package main
 import (
 	"Render/app/conect"
 	"Render/app/handler"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -40,5 +41,8 @@ func main() {
 	r.POST("/event",handler.CreateEvent)
 	r.PUT("/admin/item/img/:id",handler.PutItemByID)
 	r.PUT("/admin/item/:id",handler.PutItemByIDNoImage)
-	r.Run(":8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // fallback เผื่อใช้ local
+	}
 }
