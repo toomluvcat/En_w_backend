@@ -16,7 +16,7 @@ func CreateUser(c *gin.Context) {
 		c.Status(400)
 		return
 	}
-	result := conect.DB.Select("Name","Email","StudentID","Major").Create(&req)
+	result := conect.DB.Select("Name", "Email", "StudentID", "Major").Create(&req)
 
 	if result.Error != nil {
 		if pgErr, ok := result.Error.(*pgconn.PgError); ok && pgErr.Code == "23505" {
@@ -43,69 +43,68 @@ func GetUserByID(c *gin.Context) {
 		return
 	}
 
-	
 	type LoanItem struct {
 		ItemID   uint
 		Category string
-		Name string
+		Name     string
+		ImageUrl string
 		Quantity int
 	}
 
 	type EventResponse struct {
-		EventID   uint
-		CreatedAt time.Time
+		EventID    uint
+		CreatedAt  time.Time
 		ApprovedAt time.Time
-		Status    string
-		Loan      []LoanItem
+		Status     string
+		Loan       []LoanItem
 	}
 
 	type UserResponse struct {
-		UserID uint
-		Name   string
-		Major  string
+		UserID    uint
+		Name      string
+		Major     string
 		StudentID string
-		Email  string
-		Event []EventResponse
+		Email     string
+		Event     []EventResponse
 	}
 
-	
 	var events []EventResponse
 
-	for _,e := range userRes.Events{
+	for _, e := range userRes.Events {
 		var loans []LoanItem
-		
-		for _,l := range e.Loans{
+
+		for _, l := range e.Loans {
 			loans = append(loans, LoanItem{
-				ItemID: l.Item.ID,
-				Name: l.Item.Name,
+				ItemID:   l.Item.ID,
+				Name:     l.Item.Name,
 				Category: l.Item.Category,
+				ImageUrl: l.Item.ImageUrl,
 				Quantity: l.Quantity,
 			})
 		}
-		
+
 		var ApprovedAt time.Time
-		if e.Status =="Pending"{
-			ApprovedAt =e.UpdatedAt
+		if e.Status == "approved" {
+			ApprovedAt = e.UpdatedAt
 		}
 
 		events = append(events, EventResponse{
-			EventID: e.ID,
-			CreatedAt: e.CreatedAt,
+			EventID:    e.ID,
+			CreatedAt:  e.CreatedAt,
 			ApprovedAt: ApprovedAt,
-			Status: e.Status,
-			Loan: loans,
+			Status:     e.Status,
+			Loan:       loans,
 		})
-		
+
 	}
-	user:=UserResponse{
-		UserID: userRes.ID,
-		Name: userRes.Name,
-		Email: userRes.Email,
-		Major: userRes.Major,
+	user := UserResponse{
+		UserID:    userRes.ID,
+		Name:      userRes.Name,
+		Email:     userRes.Email,
+		Major:     userRes.Major,
 		StudentID: userRes.StudentID,
-		Event: events,
+		Event:     events,
 	}
-	
 
 	c.JSON(200, user)
 }

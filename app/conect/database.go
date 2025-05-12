@@ -1,6 +1,7 @@
 package conect
 
 import (
+	"Render/app/model"
 	"fmt"
 	"log"
 	"os"
@@ -33,15 +34,13 @@ func ConnectDB() {
 
 	fmt.Println("Connected to the database!")
 
-	// // Drop bookmarks ก่อนเพราะเป็น many2many join table
 	// _ = DB.Migrator().DropTable("bookmarks")
 	// _ = DB.Migrator().DropTable(&model.Loan{}, &model.Event{}, &model.User{}, &model.Item{})
 
-	// // สร้างตาราง เรียงตามความสัมพันธ์ FK
-	// err = DB.AutoMigrate(&model.Item{}, &model.User{}, &model.Event{}, &model.Loan{})
-	// if err != nil {
-	// 	log.Fatalf("Fail to migrate: %v", err)
-	// }
+	err = DB.AutoMigrate(&model.Item{}, &model.User{}, &model.Event{}, &model.Loan{})
+	if err != nil {
+		log.Fatalf("Fail to migrate: %v", err)
+	}
 
 	fmt.Println("Database migrated successfully!")
 }
